@@ -8,6 +8,7 @@ int w;              // Width of entire wave
 int count = 1;
 int ind = 0;
 int m = 0;
+int framecount = 1;
 
 Wave[] waves = new Wave[0];
 
@@ -15,8 +16,8 @@ float[] wavemag;
 int ylen = 0;
 
 void setup() {
-  size(400,400);
-  //framerate(30);
+  size(1200,800);
+  frameRate(15);
   colorMode(HSB,255,255,255,100);
   smooth();
   initWaves();
@@ -29,17 +30,19 @@ class Wave {
   int xspacing;  // how far apart each horizontal location should be spaced
   int w = width+16;             // width of entire wave
   float freq;
+  float phase = 0;
   int hue;
   int satOrder;
   int stroketype;
   int filltype;
-
+  float phaseshift;
   
-  Wave(float imag, int ispacing, float ifreq) {
+  Wave(float imag, int ispacing, float ifreq, float pshift) {
       mag = imag;
       freq = ifreq;
       xspacing = ispacing;
       ylen = w/xspacing;
+      phaseshift = pshift;
       yvalues = new float[ylen];
       hue = int(random(0,255));
       satOrder =int(abs(random(-2,2)));
@@ -47,11 +50,20 @@ class Wave {
       filltype = int(floor(random(0,3)));
       //println("ylen: " + ylen + " yvalues.length: " + yvalues.length + " mag: " + mag + " hue: " + hue + " freq: " + freq + " sat: " + satOrder + " stroke/fill: " + stroketype +" " + filltype);
   }
-  
+ 
   void calcWave(int count){
+
+    phase = (phase + phaseshift)%TWO_PI;
     for (int i = 0; i < yvalues.length; i++) {
-        ind = i + count;
-        yvalues[i] = sin(( (ind*freq)/(1.0*yvalues.length) )*TWO_PI)*mag;
+//        ind = i + count;
+        ind = count + i;
+        
+//        println(ind);
+//        println(
+         freq = freq%1;
+//        yvalues[i] = sin( (ind%(1.0*yvalues.length)*freq)*TWO_PI)*mag;
+        yvalues[i] = sin(( (ind*freq)/(1.0*yvalues.length) )*TWO_PI + phase)*mag;
+//          yvalues[i[ = sin(( ind
     }
   }
   
@@ -87,13 +99,16 @@ class Wave {
               break;
         }
         ellipseMode(CENTER);
-        ellipse(x*xspacing,width/2+yvalues[x],16,16);
+        //println("x spacing " + xspacing + " x " + x + " foo " + x*xspacing + " " + yvalues.length);
+        ellipse(x*xspacing,height/2+yvalues[x],16,16);
     }
   }
       
 }
 
 void draw() {
+  //println("framecount: " + framecount);
+  framecount++; 
   background(0);
   if (mousePressed){
     initWaves();
@@ -105,20 +120,27 @@ void draw() {
 void initWaves(){
 
 
-  int numwaves = int(random(4,24));
+  int numwaves = int(random(4,12));
   waves = new Wave[numwaves];
 
   int m = 0;
   while ( m < waves.length)
     {
-      waves[m] = new Wave( (random(.1, .5)*height), int(random(4, 16)), random(.2, 1.0)  );
+      waves[m] = new Wave( (random(.1, .5)*height), int(random(16, 24)), random(.2, 1.0), random(-0.1,0.1) );
+//       waves[m] = new Wave(500,int(random(4, 16)), random(.2, 1.0)  );
       m++;
     }
 }
 
 void calcWaves() {
   int j = 0;
+//  waves[j].phase = waves[j].phase + random(-0.08,0.08);
   while ( j < waves.length){
+//    if (((count%w) > 0) {
+//      waves[j].phase = waves[j].phase + random(-0.08,0.08);
+//      println("waves[j].freq: " + j + " " + waves[j].freq);
+//    }  
+    println("waves[j].phase: " + j + " " + waves[j].phase);
     waves[j].calcWave(count);
     j++;
   }
