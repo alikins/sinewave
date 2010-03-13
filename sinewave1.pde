@@ -100,7 +100,7 @@ class Wave {
         }
         ellipseMode(CENTER);
         //println("x spacing " + xspacing + " x " + x + " foo " + x*xspacing + " " + yvalues.length);
-        ellipse(x*xspacing,height/2+yvalues[x],16,16*(TWO_PI/phase));
+        ellipse(x*xspacing,height/2+yvalues[x],64*(sin(phase%TWO_PI)),64*(cos(phase%TWO_PI)));
     }
   }
       
